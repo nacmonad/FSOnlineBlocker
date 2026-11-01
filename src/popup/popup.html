@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>FSB</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <img src="../../icons/icon-48.png" alt="" width="24" height="24" />
+      <div>
+        <h1>Popunder Blocker</h1>
+        <p id="status">Checking…</p>
+      </div>
+    </header>
+
+    <label class="row">
+      <span>Enabled everywhere</span>
+      <input type="checkbox" id="master" />
+    </label>
+
+    <label class="row" id="site-row" hidden>
+      <span id="site-label">This site</span>
+      <input type="checkbox" id="site" />
+    </label>
+
+    <footer>
+      <span>Shift-click for a real popup · <kbd>Alt</kbd>+<kbd>K</kbd> toggles</span>
+      <span id="version"></span>
+    </footer>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

@@ -1,0 +1,20 @@
+/*
+ * Static click-trap neutraliser.
+ *
+ * Declared in the manifest so it lands before any page script, which is faster
+ * and more reliable than injecting a style tag from JavaScript. Selectors are
+ * the ones in config.js — keep both in sync when adding a site.
+ *
+ * The trap stays in the DOM (the ad code keeps references to it and throws
+ * `removeChild of null` otherwise); it is only made click-through.
+ */
+
+html:not([data-fsb-off]) #dontfoid,
+html:not([data-fsb-off]) [znid] {
+  pointer-events: none !important;
+}
+
+html:not([data-fsb-off]) #dontfoid {
+  background: transparent !important;
+  visibility: visible !important;
+}
