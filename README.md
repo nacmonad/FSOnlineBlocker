@@ -110,29 +110,52 @@ src/background.js        defaults, badge, badge clearing
 src/popup/               toolbar popup (master switch, per-site switch, status)
 icons/                   generated PNGs
 tools/make-icons.py      icon source (Pillow)
+tools/build-zip.sh       release packaging
+test/replica.html        local reproduction of the trap
 userscripts/fsb.user.js  standalone userscript equivalent
 ```
 
 ## Development
 
-There is no bundler. Edit, then hit **Reload** on the extension card and refresh the page.
+There is no bundler and no dependencies. Edit, then hit **Reload** on the extension card and
+refresh the page.
 
-Sanity checks:
+### Local replica
+
+`test/replica.html` reproduces the trap and the popunder listener without the live site, so
+development works even while Cloudflare is throwing a challenge:
+
+```sh
+python3 -m http.server 8765 --bind 127.0.0.1
+```
+
+Open `http://127.0.0.1:8765/test/replica.html`. It is not matched by the manifest, so either
+add `127.0.0.1` to `config.js` temporarily, or inject by hand in the console:
+
+```js
+chrome.storage // absent in a normal page, so stub it if injecting content.js manually
+```
+
+With the extension loaded and `127.0.0.1` in the config, a click on the link must increment
+nothing, change the hash, and leave the overlay re-created with
+`pointer-events: none`.
+
+### Checks
 
 ```sh
 node --check src/content.js src/background.js src/popup/popup.js
+node --check userscripts/fsb.user.js
 python3 tools/make-icons.py    # only after changing the icon source
 ```
 
-Useful verification steps on a live page:
+On a live page, these are the useful probes:
 
 ```js
 document.elementsFromPoint(innerWidth / 2, innerHeight / 2).map(e => e.tagName + '#' + e.id)
 getComputedStyle(document.getElementById('dontfoid')).pointerEvents   // "none"
 ```
 
-Then click once with the DevTools console open: there must be no new tab and no
-`removeChild` error.
+Then click once with the console open: no new tab and no `removeChild` error.
 
 ## Permissions & privacy
 

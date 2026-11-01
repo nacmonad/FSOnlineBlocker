@@ -1,0 +1,69 @@
+<!doctype html>
+<!--
+  Minimal replica of the fsonline/Adsterra pattern, for development without
+  hitting the live site (and without Cloudflare).
+
+  It has the trap (transparent fixed overlay at max z-index) and the popunder
+  listener, plus a normal link that must keep working.
+
+  Serve the repo root, open /test/replica.html, then inject src/config.js and
+  src/content.js (see README "Development").
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>FSB replica</title>
+    <style>
+      body {
+        margin: 0;
+        font: 16px/1.5 system-ui, sans-serif;
+        background: #f1f5f9;
+        color: #0f172a;
+      }
+      main {
+        padding: 40px;
+      }
+      #dontfoid {
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        z-index: 2147483647;
+        background-color: transparent;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Replica page</h1>
+      <p><a id="link" href="#navigated">A normal link that must still work</a></p>
+      <p>Blocked opens: <output id="count">0</output></p>
+      <div id="dontfoid" znid="11692342"></div>
+    </main>
+
+    <script>
+      // stands in for window.open so the test needs no tabs
+      window.realOpen = window.open;
+      window.open = function (url, name, features) {
+        window.blocked = (window.blocked || 0) + 1;
+        document.getElementById('count').textContent = window.blocked;
+        document.getElementById('count').dataset.last = url;
+        return null;
+      };
+
+      // aclib-style document-level click listener
+      document.addEventListener(
+        'click',
+        () => {
+          // aclib removes the overlay on the way out; keep that behaviour
+          const el = document.getElementById('dontfoid');
+          if (el) el.remove();
+          window.open('https://example.invalid/ad', '_blank', 'noopener,noreferrer');
+          document.body.insertAdjacentHTML('beforeend', '<div id="dontfoid" znid="11692342"></div>');
+        },
+        true,
+      );
+    </script>
+  </body>
+</html>
